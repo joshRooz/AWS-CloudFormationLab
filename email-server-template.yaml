@@ -1,0 +1,67 @@
+---
+AWSTemplateFormatVersion: "2010-09-09" #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
+
+Description: Email Server Template
+
+Parameters:
+  EnvAZ: ap-southeast-2a
+  KeyID: 
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: ### TODO: I need to create this key
+
+Resources:
+  DNSInstanceResource:
+    Type:
+
+  EC2InstanceResource:
+    Type: "AWS:EC2::Instance"
+    Properties:
+      ImageId: ami-009d6802948d06e52
+      InstanceType: t2.micro
+      SecurityGroups:
+      - !Ref EC2InstanceSecurityGroup
+      KeyName: !Ref KeyID  ### TODO: I need to create this key
+      AvailabilityZone: !Ref EnvAZ
+      UserData:
+        Fn::Base65:
+          !Sub |
+            #!/bin/bash -xe
+            # Get the latest CloudFormation Package
+            yum update -y aws-cfn-bootstrap
+            # Start cfn-init
+            /opt/aws/bin/cfn-init -s ${AWS::StackId} -r EC2InstanceResource --region ${AWS::Region}
+            # Start cfn-signal
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource EC2InstanceWaitCondition --region ${AWS::Region}
+    MetaData:
+      Comment: ### TODO: Doublcheck all of this haha #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-init.html
+      AWS::CloudFormation::Init:
+        config:
+          packages: 
+            yum: 
+              mail-stack-delivery: [] ### TODO: There is interactive configuration with this package
+
+              
+  EC2InstanceWaitCondition:
+    CreationPolicy:
+      ResourceSignal: ### TODO: Verify values below and their impact
+        Timeout: PT1M
+        Count: 1
+    Type: AWS::CloudFormation::WaitCondition
+
+  #Our EC2InstanceResource Security Group
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ### TODO: Update everything below once I know what Ports are needed
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80  
+
+
+
