@@ -4,11 +4,10 @@ The fusion of learning the inner workings of an e-mail server and automated depl
 
 # Mail Server Setup 
 2014 Blog Series Compliments of [Ars Technica](https://arstechnica.com/). Thanks for the inspiration and configuration steps.
-
-[Work Plan: Part I](https://arstechnica.com/information-technology/2014/02/how-to-run-your-own-e-mail-server-with-your-own-domain-part-1/2)
-[Work Plan: Part II](https://arstechnica.com/information-technology/2014/03/taking-e-mail-back-part-2-arming-your-server-with-postfix-dovecot/)
-[Work Plan: Part III](https://arstechnica.com/information-technology/2014/03/taking-e-mail-back-part-3-fortifying-your-box-against-spammers/)
-[Work Plan: Part IV](https://arstechnica.com/information-technology/2014/04/taking-e-mail-back-part-4-the-finale-with-webmail-everything-after/)
+- [Work Plan: Part I](https://arstechnica.com/information-technology/2014/02/how-to-run-your-own-e-mail-server-with-your-own-domain-part-1/2)
+- [Work Plan: Part II](https://arstechnica.com/information-technology/2014/03/taking-e-mail-back-part-2-arming-your-server-with-postfix-dovecot/)
+- [Work Plan: Part III](https://arstechnica.com/information-technology/2014/03/taking-e-mail-back-part-3-fortifying-your-box-against-spammers/)
+- [Work Plan: Part IV](https://arstechnica.com/information-technology/2014/04/taking-e-mail-back-part-4-the-finale-with-webmail-everything-after/)
 
 ## Components
 - MTAs - Mail Transfer Agent 
