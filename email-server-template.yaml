@@ -16,7 +16,7 @@ Resources:
   EC2InstanceResource:
     Type: "AWS:EC2::Instance"
     Properties:
-      ImageId: ami-009d6802948d06e52
+      ImageId: ami-04fcc97b5f6edcd89
       InstanceType: t2.micro
       SecurityGroups:
       - !Ref EC2InstanceSecurityGroup
@@ -27,7 +27,7 @@ Resources:
           !Sub |
             #!/bin/bash -xe
             # Get the latest CloudFormation Package
-            yum update -y aws-cfn-bootstrap
+            apt-get install -y aws-cfn-bootstrap  ### TODO: Unable to locate package aws-cfn-bootstrap
             # Start cfn-init
             /opt/aws/bin/cfn-init -s ${AWS::StackId} -r EC2InstanceResource --region ${AWS::Region}
             # Start cfn-signal
@@ -36,8 +36,13 @@ Resources:
       Comment: ### TODO: Doublcheck all of this haha #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-init.html
       AWS::CloudFormation::Init:
         config:
+          files:
+            
           packages: 
-            yum: 
+            apt-get:
+              debconf-utils: [] # So we can avoid prompts when installing mail-stack-delivery
+              #https://serverfault.com/questions/407317/passing-default-answers-to-apt-get-package-install-questions
+              #https://help.ubuntu.com/lts/installation-guide/i386/apbs03.html
               mail-stack-delivery: [] ### TODO: There is interactive configuration with this package
 
               
@@ -61,7 +66,4 @@ Resources:
       - CidrIp: 0.0.0.0/0
         FromPort: 80
         IpProtocol: tcp
-        ToPort: 80  
-
-
-
+        ToPort: 80 
