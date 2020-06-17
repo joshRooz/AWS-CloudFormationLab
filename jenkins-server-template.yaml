@@ -9,11 +9,11 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  
+
   VpcId:
     Description: Select VPC to deploy to
     Type: AWS::EC2::VPC::Id
-    
+
   VpcSubnetId:
     Description: Select subnet to deploy to
     Type: AWS::EC2::Subnet::Id
@@ -36,31 +36,29 @@ Resources:
           exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
           # Update system
           yum update -y
+          # Install the latest cfn bootstrap tools
+          yum install aws-cfn-bootstrap -y
           # Get Jenkins repo
           wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
           # Import key file
           rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
           # Start cfn-init
           /opt/aws/bin/cfn-init -v -s ${AWS::StackId} -r JenkinsMasterInstance --region ${AWS::Region}
-          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource WaitCondition --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource JenkinsMasterInstance --region ${AWS::Region}
     Metadata:
       Comment: Configure Jenkins
       AWS::CloudFormation::Init:
         config:
           files:
-          #  /var/lib/jenkins/secrets/initialAdminPassword:
-          #    content: "replacethis"
-          #    owner: jenkins
-          #    group: jenkins
             /etc/cfn/cfn-hup.conf:
               content: !Sub |
                 [main]
                 stack=${AWS::StackId}
                 region=${AWS::Region}
-              mode: 0004000
+              mode: "0004000"
               owner: root
               group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf: 
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
@@ -70,9 +68,9 @@ Resources:
                   --resource JenkinsMasterInstance
                   --region ${AWS::Region}
                 runas=root
-              mode: 000400
+              mode: "000400"
               owner: root
-              group: root              
+              group: root
           packages:
             yum:
               jenkins: []
@@ -83,24 +81,20 @@ Resources:
               jenkins:
                 enabled: true
                 ensureRunning: true
-              #cfn-hup:
-              #  enabled: true
-              #  ensureRunning: true
-              #  files:
-              #    - /etc/cfn/cfn-hup.conf
-              #    - /etc/cfn/hooks.d/cfn-auto-reloader.conf
-
-  WaitCondition:
-    Type: AWS::CloudFormation::WaitCondition
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT15M
-        Count: 1
-    
+        Timeout: PT10M
+
   JenkinsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow SSH and HTTP access 
+      GroupDescription: Allow SSH and HTTP access
       SecurityGroupIngress:
       - CidrIp: 0.0.0.0/0
         FromPort: 8080
