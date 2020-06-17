@@ -1,3 +1,3 @@
 # AWS-CloudFormationLabs
-- (Email Server)[]
-- (Jenkins Server)[]
+- [Email Server]()
+- [Jenkins Server]()
